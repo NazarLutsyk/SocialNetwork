@@ -44,4 +44,4 @@ let AccountSchema = new Schema({
     discriminatorKey: 'kind'
 });
 
-models.exports = mongoose.model('Account', AccountSchema);
+module.exports = mongoose.model('Account', AccountSchema);
