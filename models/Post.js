@@ -3,12 +3,16 @@ let Schema = require('mongoose').Schema;
 
 module.exports = Evaluetable.discriminator('Post', new Schema({
     text: String,
-    date: Date,
-    posRating: Number,
-    negRating: Number,
+    date: {
+        type: Date,
+        default: new Date()
+    },
+    posRating: Number,//todo computed
+    negRating: Number,//todo computed
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'Wall'
+        ref: 'Wall',
+        required: true
     },
     images: [{
         type: Schema.Types.ObjectId,

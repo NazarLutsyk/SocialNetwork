@@ -2,14 +2,16 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let DepartmentSchema = new Schema({
-    roles : [String],
+    roles : [String],//todo roles enum
     user : {
         type : Schema.Types.ObjectId,
-        ref : 'User'
+        ref : 'User',
+        required: true
     },
     socialGroup : {
         type : Schema.Types.ObjectId,
-        ref : 'SocialGroup'
+        ref : 'SocialGroup',
+        required: true
     }
 });
 

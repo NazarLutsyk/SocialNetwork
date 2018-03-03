@@ -4,7 +4,8 @@ let Schema = mongoose.Schema;
 let GallerySchema = new Schema({
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Account'
+        ref : 'Account',
+        required: true
     },
     images : [{
         type : Schema.Types.ObjectId,

@@ -2,12 +2,15 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let AccountSchema = new Schema({
-    username: String,
+    login: String,
     password: String,
     email: String,
     phone: String,
     city: String,
-    isBanned: Boolean,
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
     avatar: {
         type: Schema.Types.ObjectId,
         ref: 'Image'

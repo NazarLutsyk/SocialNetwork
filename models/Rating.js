@@ -2,14 +2,14 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let RatingSchema = new Schema({
-    value : Boolean,
+    value : {
+        type: Boolean,
+        required: true
+    },
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Account'
-    },
-    evaluetable : {
-        type : Schema.Types.ObjectId,
-        ref : 'Evaluetable'
+        ref : 'Account',
+        required: true
     }
 });
 

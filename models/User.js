@@ -2,10 +2,16 @@ let Account = require('./Account');
 let Schema = require('mongoose').Schema;
 
 module.exports = Account.discriminator('User', new Schema({
-    name : String,
-    surname : String,
+    name : {
+        type: String,
+        required: true
+    },
+    surname : {
+        type: String,
+        required: true
+    },
     birthday : Date,
-    roles : [String],
+    roles : [String],//todo
     friends : [{
         type : Schema.Types.ObjectId,
         ref : 'User'

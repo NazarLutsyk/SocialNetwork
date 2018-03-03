@@ -2,7 +2,10 @@ let Account = require('./Account');
 let Schema = require('mongoose').Schema;
 
 module.exports = Account.discriminator('SocialGroup', new Schema({
-    name : String,
+    name : {
+        type: String,
+        required: true
+    },
     description : String,
     subscribers : [{
         type : Schema.Types.ObjectId,
@@ -10,7 +13,8 @@ module.exports = Account.discriminator('SocialGroup', new Schema({
     }],
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'User'
+        ref : 'User',
+        required: true
     },
     departments : [{
         type : Schema.Types.ObjectId,

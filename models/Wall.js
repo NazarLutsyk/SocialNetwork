@@ -4,7 +4,8 @@ let Schema = mongoose.Schema;
 let WallSchema = new Schema({
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Account'
+        ref : 'Account',
+        required: true
     },
     posts : [{
         type : Schema.Types.ObjectId,
