@@ -1,7 +1,7 @@
 let Account = require('./Account');
 let Schema = require('mongoose').Schema;
 
-module.exports = Account.discriminator('SocialGroup', new Schema({
+let SocialGroupSchema = new Schema({
     name : {
         type: String,
         required: true
@@ -11,10 +11,9 @@ module.exports = Account.discriminator('SocialGroup', new Schema({
         type : Schema.Types.ObjectId,
         ref : 'User'
     }],
-    author : {
+    boss : {
         type : Schema.Types.ObjectId,
         ref : 'User',
-        required: true
     },
     departments : [{
         type : Schema.Types.ObjectId,
@@ -22,4 +21,24 @@ module.exports = Account.discriminator('SocialGroup', new Schema({
     }],
 }, {
     discriminatorKey: 'kind'
-}));
+});
+
+module.exports = Account.discriminator('SocialGroup', SocialGroupSchema);
+
+let User = require('./User');
+let Department = require('./Department');
+
+SocialGroupSchema.pre('remove',async function () {
+    await Department.remove(
+        {_id : this.departments}
+    );
+    await User.update(
+        {_id : this.boss},
+        {$pull: {createdSocialGroups: this._id}}
+    );
+    await User.update(
+        {_id : this.subscribers},
+        {$pull: {subscribes: this._id}},
+        {multi: true}
+    );
+});

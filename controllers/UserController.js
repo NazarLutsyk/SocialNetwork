@@ -21,7 +21,7 @@ module.exports = {
     async getUserById(req, res) {
         let userId = req.params.id;
         try {
-            let userQuery = User.find({_id: userId})
+            let userQuery = User.findOne({_id: userId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

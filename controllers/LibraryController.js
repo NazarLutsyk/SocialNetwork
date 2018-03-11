@@ -21,7 +21,7 @@ module.exports = {
     async getLibraryById(req, res) {
         let libraryId = req.params.id;
         try {
-            let libraryQuery = Library.find({_id: libraryId})
+            let libraryQuery = Library.findOne({_id: libraryId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

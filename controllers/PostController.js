@@ -21,7 +21,7 @@ module.exports = {
     async getPostById(req, res) {
         let postId = req.params.id;
         try {
-            let postQuery = Post.find({_id: postId})
+            let postQuery = Post.findOne({_id: postId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

@@ -5,7 +5,6 @@ let WallSchema = new Schema({
     author : {
         type : Schema.Types.ObjectId,
         ref : 'Account',
-        required: true
     },
     posts : [{
         type : Schema.Types.ObjectId,
@@ -14,3 +13,16 @@ let WallSchema = new Schema({
 });
 
 module.exports = mongoose.model('Wall',WallSchema);
+
+let Account = require('./Account');
+let Post = require('./Post');
+
+WallSchema.pre('remove', async function () {
+    await Account.update(
+        {wall: this._id},
+        {wall: null}
+    );
+    await Post.remove(
+        {_id : this.posts}
+    );
+});

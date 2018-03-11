@@ -21,7 +21,7 @@ module.exports = {
     async getImageById(req, res) {
         let imageId = req.params.id;
         try {
-            let imageQuery = Image.find({_id: imageId})
+            let imageQuery = Image.findone({_id: imageId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

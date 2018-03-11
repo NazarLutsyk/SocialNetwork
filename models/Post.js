@@ -1,18 +1,15 @@
 let Evaluetable = require('./Evaluetable');
 let Schema = require('mongoose').Schema;
 
-module.exports = Evaluetable.discriminator('Post', new Schema({
+let PostSchema = new Schema({
     text: String,
     date: {
         type: Date,
         default: new Date()
     },
-    posRating: Number,//todo computed
-    negRating: Number,//todo computed
     author: {
         type: Schema.Types.ObjectId,
         ref: 'Wall',
-        required: true
     },
     images: [{
         type: Schema.Types.ObjectId,
@@ -28,8 +25,26 @@ module.exports = Evaluetable.discriminator('Post', new Schema({
     },
     reposts: [{
         type: Schema.Types.ObjectId,
-        ref: 'Account'
+        ref: 'Wall'
     }]
 }, {
     discriminatorKey: 'kind'
-}));
+});
+
+module.exports = Evaluetable.discriminator('Post', PostSchema);
+
+let Wall = require('./Wall');
+let Message = require('./Message');
+
+PostSchema.pre('remove', async function () {
+    await Wall.update(
+        {$or: [{_id: author},{_id: reposts}]},
+        {$pull: {posts: this._id}},
+        {multi: true}
+    );
+    await Message.update(
+        {posts: this._id},
+        {$pull: {posts: this._id}},
+        {multi: true}
+    );
+});

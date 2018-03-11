@@ -21,7 +21,7 @@ module.exports = {
     async getChatById(req, res) {
         let chatId = req.params.id;
         try {
-            let chatQuery = Chat.find({_id: chatId})
+            let chatQuery = Chat.findOne({_id: chatId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

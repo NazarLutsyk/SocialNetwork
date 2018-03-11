@@ -21,7 +21,7 @@ module.exports = {
     async getBookById(req, res) {
         let bookId = req.params.id;
         try {
-            let bookQuery = Book.find({_id: bookId})
+            let bookQuery = Book.findOne({_id: bookId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

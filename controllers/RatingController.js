@@ -21,7 +21,7 @@ module.exports = {
     async getRatingById(req, res) {
         let ratingId = req.params.id;
         try {
-            let ratingQuery = Rating.find({_id: ratingId})
+            let ratingQuery = Rating.findOne({_id: ratingId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

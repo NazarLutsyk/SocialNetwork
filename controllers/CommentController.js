@@ -21,7 +21,7 @@ module.exports = {
     async getCommentById(req, res) {
         let commentId = req.params.id;
         try {
-            let commentQuery = Comment.find({_id: commentId})
+            let commentQuery = Comment.findOne({_id: commentId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

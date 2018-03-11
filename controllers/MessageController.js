@@ -21,7 +21,7 @@ module.exports = {
     async getMessageById(req, res) {
         let messageId = req.params.id;
         try {
-            let messageQuery = Message.find({_id: messageId})
+            let messageQuery = Message.findOne({_id: messageId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

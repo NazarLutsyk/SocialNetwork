@@ -21,7 +21,7 @@ module.exports = {
     async getWallById(req, res) {
         let wallId = req.params.id;
         try {
-            let wallQuery = Wall.find({_id: wallId})
+            let wallQuery = Wall.findOne({_id: wallId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

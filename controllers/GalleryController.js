@@ -21,7 +21,7 @@ module.exports = {
     async getGalleryById(req, res) {
         let galleryId = req.params.id;
         try {
-            let galleryQuery = Gallery.find({_id: galleryId})
+            let galleryQuery = Gallery.findOne({_id: galleryId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

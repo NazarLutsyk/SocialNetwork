@@ -48,3 +48,39 @@ let AccountSchema = new Schema({
 });
 
 module.exports = mongoose.model('Account', AccountSchema);
+
+let Message = require('./Message');
+let Chat = require('./Chat');
+let Gallery = require('./Gallery');
+let Wall = require('./Wall');
+let Library = require('./Library');
+let Comment = require('./Comment');
+let Rating = require('./Rating');
+
+AccountSchema.pre('remove', async function () {
+    await Message.remove(
+        {_id: this.messages}
+    );
+    await Chat.remove(
+        {$and: [{members: this._id}, {members: {$size: {$eq: 1}}}]}
+    );
+    await Chat.update(
+        {$and: [{members: this._id}, {members: {$size: {$gt: 1}}}]},
+        {$pull: {members: this._id}}
+    );
+    await Gallery.remove(
+        {_id : this.gallery}
+    );
+    await Wall.remove(
+        {_id : this.wall}
+    );
+    await Library.remove(
+        {_id : this.library}
+    );
+    await Comment.remove(
+        {_id : this.comments}
+    );
+    await Rating.remove(
+        {_id : this.rating}
+    );
+});

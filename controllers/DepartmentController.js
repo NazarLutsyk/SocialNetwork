@@ -21,7 +21,7 @@ module.exports = {
     async getDepartmentById(req, res) {
         let departmentId = req.params.id;
         try {
-            let departmentQuery = Department.find({_id: departmentId})
+            let departmentQuery = Department.findOne({_id: departmentId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

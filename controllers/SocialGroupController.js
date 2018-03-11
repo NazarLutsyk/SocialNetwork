@@ -21,7 +21,7 @@ module.exports = {
     async getSocialGroupById(req, res) {
         let socialGroupId = req.params.id;
         try {
-            let socialGroupQuery = SocialGroup.find({_id: socialGroupId})
+            let socialGroupQuery = SocialGroup.findOne({_id: socialGroupId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
