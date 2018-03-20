@@ -12,10 +12,6 @@ let ChatSchema = new Schema({
             ref: 'Account'
         }]
     },
-    messages: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Message'
-    }]
 });
 
 module.exports = mongoose.model('Chat', ChatSchema);
@@ -25,10 +21,6 @@ let Account = require('./Account');
 
 ChatSchema.pre('remove', async function () {
     await Message.remove(
-        {_id: this.messages}
-    );
-    await Account.update(
-        {chats: this._id},
-        {$pull: {chats: this._id}}
+        {chat: this._id}
     );
 });

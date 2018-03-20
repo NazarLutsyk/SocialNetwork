@@ -14,11 +14,8 @@ let SocialGroupSchema = new Schema({
     boss : {
         type : Schema.Types.ObjectId,
         ref : 'User',
+        required: true
     },
-    departments : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Department'
-    }],
 }, {
     discriminatorKey: 'kind'
 });
@@ -30,15 +27,6 @@ let Department = require('./Department');
 
 SocialGroupSchema.pre('remove',async function () {
     await Department.remove(
-        {_id : this.departments}
-    );
-    await User.update(
-        {_id : this.boss},
-        {$pull: {createdSocialGroups: this._id}}
-    );
-    await User.update(
-        {_id : this.subscribers},
-        {$pull: {subscribes: this._id}},
-        {multi: true}
+        {socialGroup : this._id}
     );
 });

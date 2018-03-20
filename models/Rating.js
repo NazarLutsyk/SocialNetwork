@@ -6,26 +6,16 @@ let RatingSchema = new Schema({
         type: Boolean,
         required: true
     },
+    target: {
+        type: Schema.Types.ObjectId,
+        ref: 'Evaluetable',
+        required: true
+    },
     author : {
         type : Schema.Types.ObjectId,
         ref : 'Account',
+        required: true
     }
 });
 
 module.exports = mongoose.model('Rating',RatingSchema);
-
-let Evaluetable = require('./Evaluetable');
-let Account = require('./Account');
-
-RatingSchema.pre('remove',async function () {
-    await Evaluetable.update(
-        {ratings : this._id},
-        {$pull: {ratings : this._id}},
-        {multi: true}
-    );
-    await Account.update(
-        {ratings : this._id},
-        {$pull: {ratings : this._id}},
-        {multi: true}
-    );
-});

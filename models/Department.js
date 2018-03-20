@@ -6,10 +6,12 @@ let DepartmentSchema = new Schema({
     user : {
         type : Schema.Types.ObjectId,
         ref : 'User',
+        required: true
     },
     socialGroup : {
         type : Schema.Types.ObjectId,
         ref : 'SocialGroup',
+        required: true
     }
 });
 

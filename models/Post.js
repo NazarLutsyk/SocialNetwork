@@ -10,6 +10,7 @@ let PostSchema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: 'Wall',
+        required: true
     },
     images: [{
         type: Schema.Types.ObjectId,
@@ -19,32 +20,8 @@ let PostSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Book'
     }],
-    post: {
-        type: Schema.Types.ObjectId,
-        ref: 'Post'
-    },
-    reposts: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Wall'
-    }]
 }, {
     discriminatorKey: 'kind'
 });
 
 module.exports = Evaluetable.discriminator('Post', PostSchema);
-
-let Wall = require('./Wall');
-let Message = require('./Message');
-
-PostSchema.pre('remove', async function () {
-    await Wall.update(
-        {$or: [{_id: author},{_id: reposts}]},
-        {$pull: {posts: this._id}},
-        {multi: true}
-    );
-    await Message.update(
-        {posts: this._id},
-        {$pull: {posts: this._id}},
-        {multi: true}
-    );
-});

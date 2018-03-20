@@ -10,30 +10,16 @@ let CommentSchema = new Schema({
         type: Date,
         default: new Date()
     },
-    images: [{
+    target: {
         type: Schema.Types.ObjectId,
-        ref: 'Image'
-    }],
+        ref: 'Evaluetable',
+        required: true
+    },
     author: {
         type: Schema.Types.ObjectId,
         ref: 'Account',
+        required: true
     }
 });
 
 module.exports = mongoose.model('Comment', CommentSchema);
-
-let Evaluetable = require('./Evaluetable');
-let Account = require('./Account');
-
-CommentSchema.pre('remove',async function () {
-    await Evaluetable.update(
-        {comments : this._id},
-        {$pull: {comments : this._id}},
-        {multi: true}
-    );
-    await Account.update(
-        {comments : this._id},
-        {$pull: {comments : this._id}},
-        {multi: true}
-    );
-});

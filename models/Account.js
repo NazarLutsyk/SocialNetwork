@@ -15,51 +15,20 @@ let AccountSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Image'
     },
-    library: {
-        type: Schema.Types.ObjectId,
-        ref: 'Library'
-    },
-    wall: {
-        type: Schema.Types.ObjectId,
-        ref: 'Wall'
-    },
-    gallery: {
-        type: Schema.Types.ObjectId,
-        ref: 'Gallery'
-    },
-    comments: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
-    }],
-    rating: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Rating'
-    }],
-    chats: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Chat'
-    }],
-    messages: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Message'
-    }]
 }, {
     discriminatorKey: 'kind'
 });
 
 module.exports = mongoose.model('Account', AccountSchema);
 
-let Message = require('./Message');
 let Chat = require('./Chat');
 let Gallery = require('./Gallery');
 let Wall = require('./Wall');
 let Library = require('./Library');
-let Comment = require('./Comment');
-let Rating = require('./Rating');
 
 AccountSchema.pre('remove', async function () {
     await Message.remove(
-        {_id: this.messages}
+        {sender: this._id}
     );
     await Chat.remove(
         {$and: [{members: this._id}, {members: {$size: {$eq: 1}}}]}
@@ -69,18 +38,12 @@ AccountSchema.pre('remove', async function () {
         {$pull: {members: this._id}}
     );
     await Gallery.remove(
-        {_id : this.gallery}
+        {author : this._id}
     );
     await Wall.remove(
-        {_id : this.wall}
+        {author : this._id}
     );
     await Library.remove(
-        {_id : this.library}
-    );
-    await Comment.remove(
-        {_id : this.comments}
-    );
-    await Rating.remove(
-        {_id : this.rating}
+        {author : this._id}
     );
 });
