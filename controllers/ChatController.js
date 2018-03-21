@@ -1,4 +1,5 @@
 let Chat = require('../models/Chat');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getChats(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createChat(req, res) {
         try {
-            let chat = await Chat.create(req.body);
+            let chat = new Chat(req.body);
+            chat = await chat.supersave();
             res.status(201).json(chat);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateChat(req, res) {
         let chatId = req.params.id;
         try {
-            let chat = await Chat.findByIdAndUpdate(chatId, req.body,{new : true});
-            res.status(201).json(chat);
+            let err = keysValidator.diff(Chat.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let chat = await Chat.findById(chatId);
+                if (chat && req.body) {
+                    let updated = await Chat.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

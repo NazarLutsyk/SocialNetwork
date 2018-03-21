@@ -1,4 +1,5 @@
 let Wall = require('../models/Wall');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getWalls(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createWall(req, res) {
         try {
-            let wall = await Wall.create(req.body);
+            let wall = new Wall(req.body);
+            wall = await wall.supersave();
             res.status(201).json(wall);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateWall(req, res) {
         let wallId = req.params.id;
         try {
-            let wall = await Wall.findByIdAndUpdate(wallId, req.body,{new : true});
-            res.status(201).json(wall);
+            let err = keysValidator.diff(Wall.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let wall = await Wall.findById(wallId);
+                if (wall && req.body) {
+                    let updated = await Wall.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

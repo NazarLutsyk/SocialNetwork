@@ -24,7 +24,6 @@ module.exports = Account.discriminator('User', UserSchema);
 
 let SocialGroup = require('./SocialGroup');
 let Department = require('./Department');
-
 UserSchema.pre('remove',async function (){
     await UserSchema.update(
         {_id : this.friends},
@@ -33,10 +32,6 @@ UserSchema.pre('remove',async function (){
     await SocialGroup.update(
         {subscribers : this._id},
         {$pull : {subscribers: this._id}}
-    );
-    await SocialGroup.update(
-        {boss : this._id},
-        {boss: null}
     );
     await Department.remove(
         {user : this._id}

@@ -1,4 +1,5 @@
 let User = require('../models/User');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getUsers(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createUser(req, res) {
         try {
-            let user = await User.create(req.body);
+            let user = new User(req.body);
+            user = await user.supersave();
             res.status(201).json(user);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateUser(req, res) {
         let userId = req.params.id;
         try {
-            let user = await User.findByIdAndUpdate(userId, req.body,{new : true});
-            res.status(201).json(user);
+            let err = keysValidator.diff(User.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let user = await User.findById(bookId);
+                if (user && req.body) {
+                    let updated = await User.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

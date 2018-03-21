@@ -1,4 +1,5 @@
 let Gallery = require('../models/Gallery');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getGallerys(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createGallery(req, res) {
         try {
-            let gallery = await Gallery.create(req.body);
+            let gallery = new Gallery(req.body);
+            gallery = await gallery.supersave();
             res.status(201).json(gallery);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateGallery(req, res) {
         let galleryId = req.params.id;
         try {
-            let gallery = await Gallery.findByIdAndUpdate(galleryId, req.body,{new : true});
-            res.status(201).json(gallery);
+            let err = keysValidator.diff(Gallery.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let gallery = await Gallery.findById(galleryId);
+                if (gallery && req.body) {
+                    let updated = await Gallery.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

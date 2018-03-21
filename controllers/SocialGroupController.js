@@ -1,4 +1,5 @@
 let SocialGroup = require('../models/SocialGroup');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getSocialGroups(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createSocialGroup(req, res) {
         try {
-            let socialGroup = await SocialGroup.create(req.body);
+            let socialGroup = new SocialGroup(req.body);
+            socialGroup = await socialGroup.supersave();
             res.status(201).json(socialGroup);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateSocialGroup(req, res) {
         let socialGroupId = req.params.id;
         try {
-            let socialGroup = await SocialGroup.findByIdAndUpdate(socialGroupId, req.body,{new : true});
-            res.status(201).json(socialGroup);
+            let err = keysValidator.diff(SocialGroup.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let socialGroup = await SocialGroup.findById(socialGroupId);
+                if (socialGroup && req.body) {
+                    let updated = await SocialGroup.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

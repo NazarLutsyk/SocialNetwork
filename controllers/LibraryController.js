@@ -1,4 +1,5 @@
 let Library = require('../models/Library');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getLibrarys(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createLibrary(req, res) {
         try {
-            let library = await Library.create(req.body);
+            let library = new Library(req.body);
+            library = await library.supersave();
             res.status(201).json(library);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateLibrary(req, res) {
         let libraryId = req.params.id;
         try {
-            let library = await Library.findByIdAndUpdate(libraryId, req.body,{new : true});
-            res.status(201).json(library);
+            let err = keysValidator.diff(Library.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let library = await Library.findById(libraryId);
+                if (library && req.body) {
+                    let updated = await Library.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

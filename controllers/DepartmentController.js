@@ -1,4 +1,5 @@
 let Department = require('../models/Department');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getDepartments(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createDepartment(req, res) {
         try {
-            let department = await Department.create(req.body);
+            let department = new Department(req.body);
+            department = await department.supersave();
             res.status(201).json(department);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateDepartment(req, res) {
         let departmentId = req.params.id;
         try {
-            let department = await Department.findByIdAndUpdate(departmentId, req.body,{new : true});
-            res.status(201).json(department);
+            let err = keysValidator.diff(Department.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let departmentId = await Department.findById(departmentId);
+                if (departmentId && req.body) {
+                    let updated = await Department.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

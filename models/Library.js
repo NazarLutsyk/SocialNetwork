@@ -9,10 +9,27 @@ let LibrarySchema = new Schema({
     }
 });
 
+LibrarySchema.methods.supersave = async function () {
+    let Account = require('./Account');
+    let author = await Account.findById(this.author);
+    if (!author) {
+        throw new Error('Not found related model Account!');
+    }
+    return await this.save();
+};
+
+LibrarySchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require('../helpers/objectHelper');
+    if (newDoc.author) {
+        throw new Error('Can`t update relations!');
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+};
+
 module.exports = mongoose.model('Library',LibrarySchema);
 
 let Book = require('./Book');
-
 LibrarySchema.pre('remove', async function () {
     await Book.remove(
         {author : this._id}

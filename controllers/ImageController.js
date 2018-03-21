@@ -1,4 +1,5 @@
 let Image = require('../models/Image');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getImages(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createImage(req, res) {
         try {
-            let image = await Image.create(req.body);
+            let image = new Image(req.body);
+            image = await image.supersave();
             res.status(201).json(image);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateImage(req, res) {
         let imageId = req.params.id;
         try {
-            let image = await Image.findByIdAndUpdate(imageId, req.body,{new : true});
-            res.status(201).json(image);
+            let err = keysValidator.diff(Image.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let image = await Image.findById(imageId);
+                if (image && req.body) {
+                    let updated = await Image.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -1,4 +1,5 @@
 let Book = require('../models/Book');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getBooks(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createBook(req, res) {
         try {
-            let book = await Book.create(req.body);
+            let book = new Book(req.body);
+            book = await book.supersave();
             res.status(201).json(book);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateBook(req, res) {
         let bookId = req.params.id;
         try {
-            let book = await Book.findByIdAndUpdate(bookId, req.body,{new : true});
-            res.status(201).json(book);
+            let err = keysValidator.diff(Book.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let book = await Book.findById(bookId);
+                if (book && req.body) {
+                    let updated = await Book.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

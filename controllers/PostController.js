@@ -1,4 +1,5 @@
 let Post = require('../models/Post');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getPosts(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createPost(req, res) {
         try {
-            let post = await Post.create(req.body);
+            let post = new Post(req.body);
+            post = await post.supersave();
             res.status(201).json(post);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updatePost(req, res) {
         let postId = req.params.id;
         try {
-            let post = await Post.findByIdAndUpdate(postId, req.body,{new : true});
-            res.status(201).json(post);
+            let err = keysValidator.diff(Post.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let post = await Post.findById(postId);
+                if (post && req.body) {
+                    let updated = await Post.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

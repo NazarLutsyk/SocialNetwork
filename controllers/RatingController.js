@@ -1,4 +1,5 @@
 let Rating = require('../models/Rating');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getRatings(req, res) {
@@ -36,7 +37,8 @@ module.exports = {
     },
     async createRating(req, res) {
         try {
-            let rating = await Rating.create(req.body);
+            let rating = new Rating(req.body);
+            rating = await rating.supersave();
             res.status(201).json(rating);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -45,8 +47,18 @@ module.exports = {
     async updateRating(req, res) {
         let ratingId = req.params.id;
         try {
-            let rating = await Rating.findByIdAndUpdate(ratingId, req.body,{new : true});
-            res.status(201).json(rating);
+            let err = keysValidator.diff(Rating.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let rating = await Rating.findById(ratingId);
+                if (rating && req.body) {
+                    let updated = await Rating.superupdate(req.body);
+                    res.status(201).json(updated);
+                }else {
+                    res.sendStatus(404);
+                }
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -2,8 +2,6 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let EvaluetableSchema = new Schema({
-    posRating: Number,//todo computed
-    negRating: Number,//todo computed
 });
 
 module.exports = mongoose.model('Evaluetable',EvaluetableSchema);
