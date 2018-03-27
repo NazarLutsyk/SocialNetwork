@@ -1,4 +1,5 @@
 let Book = require('../models/Book');
+let Library = require('../models/Library');
 let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
@@ -37,9 +38,16 @@ module.exports = {
     },
     async createBook(req, res) {
         try {
-            let book = new Book(req.body);
-            book = await book.supersave();
-            res.status(201).json(book);
+            let err = keysValidator.diff(Book.schema.tree, req.body);
+            if (err) {
+                throw new Error('Unknown fields ' + err);
+            } else {
+                //todo upload
+                req.body.author = await Library.findOne({author: req.user._id});
+                let book = new Book(req.body);
+                book = await book.supersave();
+                res.status(201).json(book);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

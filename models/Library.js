@@ -4,16 +4,18 @@ let Schema = mongoose.Schema;
 let LibrarySchema = new Schema({
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Account',
+        ref : 'Library',
         required: true
     }
+},{
+    timestamps: true
 });
 
 LibrarySchema.methods.supersave = async function () {
-    let Account = require('./Account');
-    let author = await Account.findById(this.author);
+    let User = require('./User');
+    let author = await User.findById(this.author);
     if (!author) {
-        throw new Error('Not found related model Account!');
+        throw new Error('Not found related model User!');
     }
     return await this.save();
 };

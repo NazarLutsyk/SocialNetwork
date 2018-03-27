@@ -13,19 +13,21 @@ let RatingSchema = new Schema({
     },
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Account',
+        ref : 'User',
         required: true
     }
+},{
+    timestamps: true
 });
 
 RatingSchema.methods.supersave = async function () {
-    let Account = require('./Account');
+    let User = require('./User');
     let Evaluetable = require('./Evaluetable');
-    let author = await Account.findById(this.author);
+    let author = await User.findById(this.author);
     let target = await Evaluetable.findById(this.target);
 
     if (!author) {
-        throw new Error('Not found related model Account!');
+        throw new Error('Not found related model User!');
     }
     if (!target) {
         throw new Error('Not found related model Evaluetable!');

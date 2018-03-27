@@ -37,9 +37,15 @@ module.exports = {
     },
     async createChat(req, res) {
         try {
-            let chat = new Chat(req.body);
-            chat = await chat.supersave();
-            res.status(201).json(chat);
+            let err = keysValidator.diff(Chat.schema.tree, req.body);
+            if (err) {
+                throw new Error('Unknown fields ' + err);
+            } else {
+                //todo auto members
+                let chat = new Chat(req.body);
+                chat = await chat.supersave();
+                res.status(201).json(chat);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

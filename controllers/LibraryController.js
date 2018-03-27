@@ -37,27 +37,14 @@ module.exports = {
     },
     async createLibrary(req, res) {
         try {
-            let library = new Library(req.body);
-            library = await library.supersave();
-            res.status(201).json(library);
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async updateLibrary(req, res) {
-        let libraryId = req.params.id;
-        try {
             let err = keysValidator.diff(Library.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let library = await Library.findById(libraryId);
-                if (library && req.body) {
-                    let updated = await Library.superupdate(req.body);
-                    res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
-                }
+                req.body.author =req.user._id;
+                let library = new Library(req.body);
+                library = await library.supersave();
+                res.status(201).json(library);
             }
         } catch (e) {
             res.status(400).send(e.toString());

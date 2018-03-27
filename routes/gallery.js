@@ -8,6 +8,5 @@ router.route('/')
     .post(GalleryController.createGallery);
 router.route('/:id')
     .get(GalleryController.getGalleryById)
-    .put(GalleryController.updateGallery)
     .delete(GalleryController.removeGallery);
 module.exports = router;

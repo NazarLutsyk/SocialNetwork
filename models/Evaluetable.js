@@ -2,6 +2,8 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let EvaluetableSchema = new Schema({
+},{
+    timestamps: true
 });
 
 module.exports = mongoose.model('Evaluetable',EvaluetableSchema);

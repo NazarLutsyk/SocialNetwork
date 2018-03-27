@@ -1,2 +1,8 @@
 //todo add images limit in message post etc.
-//todo add timestamps
+//+add timestamps
+//todo add upload images
+//todo add validation
+//todo add disallow update some fields
+//todo add authorization
+//todo add clusters
+//+delete some update

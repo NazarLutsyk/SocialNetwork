@@ -20,7 +20,7 @@ let BookSchema = new Schema({
         required: true
     }
 }, {
-    discriminatorKey: 'kind'
+    discriminatorKey: 'kind',
 });
 BookSchema.methods.supersave = async function () {
     let Library = require('./Library');

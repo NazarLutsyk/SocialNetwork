@@ -37,9 +37,15 @@ module.exports = {
     },
     async createRating(req, res) {
         try {
-            let rating = new Rating(req.body);
-            rating = await rating.supersave();
-            res.status(201).json(rating);
+            let err = keysValidator.diff(Rating.schema.tree, req.body);
+            if (err) {
+                throw new Error('Unknown fields ' + err);
+            } else {
+                req.body.author = req.user._id;
+                let rating = new Rating(req.body);
+                rating = await rating.supersave();
+                res.status(201).json(rating);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

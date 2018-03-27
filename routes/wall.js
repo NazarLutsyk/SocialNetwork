@@ -8,6 +8,5 @@ router.route('/')
     .post(WallController.createWall);
 router.route('/:id')
     .get(WallController.getWallById)
-    .put(WallController.updateWall)
     .delete(WallController.removeWall);
 module.exports = router;

@@ -37,27 +37,14 @@ module.exports = {
     },
     async createComment(req, res) {
         try {
-            let comment = new Comment(req.body);
-            comment = await comment.supersave();
-            res.status(201).json(comment);
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async updateComment(req, res) {
-        let commentId = req.params.id;
-        try {
-            let err = keysValidator.diff(Comment.schema.tree, req.body);
-            if (err){
+            let err = keysValidator.diff(Book.schema.tree, req.body);
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let comment = await Comment.findById(commentId);
-                if (comment && req.body) {
-                    let updated = await Comment.superupdate(req.body);
-                    res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
-                }
+                req.body.author = req.user._id;
+                let book = new Book(req.body);
+                book = await book.supersave();
+                res.status(201).json(book);
             }
         } catch (e) {
             res.status(400).send(e.toString());

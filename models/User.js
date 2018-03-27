@@ -1,40 +1,74 @@
-let Account = require('./Account');
+let mongoose = require('mongoose');
 let Schema = require('mongoose').Schema;
+let bcrypt = require('bcrypt');
 
 let UserSchema = new Schema({
-    name : {
+    name: {
         type: String,
         required: true
     },
-    surname : {
+    surname: {
         type: String,
         required: true
     },
-    birthday : Date,
-    roles : [String],//todo
-    friends : [{
-        type : Schema.Types.ObjectId,
-        ref : 'User'
+    login: String,
+    password: String,
+    email: String,
+    phone: String,
+    city: String,
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
+    avatar: {
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
+    },
+    birthday: Date,
+    roles: [String],//todo
+    friends: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }],
 }, {
-    discriminatorKey: 'kind'
+    timestamps: true
 });
 
-module.exports = Account.discriminator('User', UserSchema);
+UserSchema.methods.encryptPassword = function (password) {
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
+};
+UserSchema.methods.validPassword = function (password) {
+    return bcrypt.compareSync(password, this.password);
+};
 
-let SocialGroup = require('./SocialGroup');
-let Department = require('./Department');
-UserSchema.pre('remove',async function (){
+module.exports = mongoose.model('User', UserSchema);
+
+let Chat = require('./Chat');
+let Gallery = require('./Gallery');
+let Wall = require('./Wall');
+let Library = require('./Library');
+UserSchema.pre('remove', async function () {
     await UserSchema.update(
-        {_id : this.friends},
-        {$pull : {friends: this._id}}
+        {_id: this.friends},
+        {$pull: {friends: this._id}}
     );
-    await SocialGroup.update(
-        {subscribers : this._id},
-        {$pull : {subscribers: this._id}}
+    await Chat.remove(
+        {$and: [{members: this._id}, {members: {$size: {$eq: 1}}}]}
     );
-    await Department.remove(
-        {user : this._id}
+    await Chat.update(
+        {$and: [{members: this._id}, {members: {$size: {$gt: 1}}}]},
+        {$pull: {members: this._id}}
     );
-
+    await Message.remove(
+        {sender: this._id}
+    );
+    await Gallery.remove(
+        {author: this._id}
+    );
+    await Wall.remove(
+        {author: this._id}
+    );
+    await Library.remove(
+        {author: this._id}
+    );
 });

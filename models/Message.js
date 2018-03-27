@@ -6,13 +6,9 @@ let MessageSchema = new Schema({
         type: String,
         required: true
     },
-    date: {
-        type: Date,
-        default: new Date()
-    },
     sender: {
         type: Schema.Types.ObjectId,
-        ref: 'Account',
+        ref: 'User',
         required: true
     },
     chat: {
@@ -20,19 +16,21 @@ let MessageSchema = new Schema({
         ref: 'Chat',
         required: true
     },
+},{
+    timestamps: true
 });
 MessageSchema.methods.supersave = async function () {
-    let Account = require('./Account');
+    let User = require('./User');
     let Chat = require('./Chat');
 
     let chat = await Chat.findById(this.chat);
-    let account = await Account.findById(this.sender);
+    let account = await User.findById(this.sender);
 
     if (!chat) {
         throw new Error('Not found related model Chat!');
     }
     if (!account) {
-        throw new Error('Not found related model Account!');
+        throw new Error('Not found related model User!');
     }
 
     return await this.save();

@@ -37,27 +37,14 @@ module.exports = {
     },
     async createMessage(req, res) {
         try {
-            let message = new Message(req.body);
-            message = await message.supersave();
-            res.status(201).json(message);
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async updateMessage(req, res) {
-        let messageId = req.params.id;
-        try {
             let err = keysValidator.diff(Message.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let message = await Message.findById(messageId);
-                if (message && req.body) {
-                    let updated = await Message.superupdate(req.body);
-                    res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
-                }
+                req.body.sender = req.user._id;
+                let message = new Message(req.body);
+                message = await message.supersave();
+                res.status(201).json(message);
             }
         } catch (e) {
             res.status(400).send(e.toString());

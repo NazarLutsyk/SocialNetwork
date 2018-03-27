@@ -3,10 +3,6 @@ let Schema = require('mongoose').Schema;
 
 let PostSchema = new Schema({
     text: String,
-    date: {
-        type: Date,
-        default: new Date()
-    },
     author: {
         type: Schema.Types.ObjectId,
         ref: 'Wall',

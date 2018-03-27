@@ -8,6 +8,5 @@ router.route('/')
     .post(MessageController.createMessage);
 router.route('/:id')
     .get(MessageController.getMessageById)
-    .put(MessageController.updateMessage)
     .delete(MessageController.removeMessage);
 module.exports = router;

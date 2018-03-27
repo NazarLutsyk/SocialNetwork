@@ -37,27 +37,14 @@ module.exports = {
     },
     async createWall(req, res) {
         try {
-            let wall = new Wall(req.body);
-            wall = await wall.supersave();
-            res.status(201).json(wall);
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async updateWall(req, res) {
-        let wallId = req.params.id;
-        try {
             let err = keysValidator.diff(Wall.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let wall = await Wall.findById(wallId);
-                if (wall && req.body) {
-                    let updated = await Wall.superupdate(req.body);
-                    res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
-                }
+                req.body.author = req.user._id;
+                let wall = new Wall(req.body);
+                wall = await wall.supersave();
+                res.status(201).json(wall);
             }
         } catch (e) {
             res.status(400).send(e.toString());

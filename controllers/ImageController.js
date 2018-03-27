@@ -1,4 +1,5 @@
 let Image = require('../models/Image');
+let Gallery = require('../models/Gallery');
 let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
@@ -37,9 +38,16 @@ module.exports = {
     },
     async createImage(req, res) {
         try {
-            let image = new Image(req.body);
-            image = await image.supersave();
-            res.status(201).json(image);
+            let err = keysValidator.diff(Image.schema.tree, req.body);
+            if (err) {
+                throw new Error('Unknown fields ' + err);
+            } else {
+                //todo upload
+                req.body.author = await Gallery.findOne({author: req.user._id});
+                let image = new Image(req.body);
+                image = await image.supersave();
+                res.status(201).json(image);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

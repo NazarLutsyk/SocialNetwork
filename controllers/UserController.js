@@ -35,15 +35,6 @@ module.exports = {
             res.status(404).send(e.toString());
         }
     },
-    async createUser(req, res) {
-        try {
-            let user = new User(req.body);
-            user = await user.supersave();
-            res.status(201).json(user);
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
     async updateUser(req, res) {
         let userId = req.params.id;
         try {

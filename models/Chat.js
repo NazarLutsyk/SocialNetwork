@@ -9,27 +9,29 @@ let ChatSchema = new Schema({
     members: {
         type: [{
             type: Schema.Types.ObjectId,
-            ref: 'Account'
+            ref: 'User'
         }]
     },
+},{
+    timestamps: true
 });
 
 ChatSchema.methods.supersave = async function () {
-    let Account = require('./Account');
-    let accountExists = await Account.count({_id: this.members});
+    let User = require('./User');
+    let accountExists = await User.count({_id: this.members});
     if ((accountExists === 0 && this.members.length !== 0) || (accountExists !== this.members.length)) {
-        throw new Error('Not found related model Account!');
+        throw new Error('Not found related model User!');
     }
     return await this.save();
 };
 
 ChatSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
-    let Account = require('./Account');
+    let User = require('./User');
 
-    let accountExists = await Account.count({_id: newDoc.members});
+    let accountExists = await User.count({_id: newDoc.members});
     if ((accountExists === 0 && this.members.length !== 0) || (accountExists !== this.members.length)) {
-        throw new Error('Not found related model Account!');
+        throw new Error('Not found related model User!');
     }
     objectHelper.load(this, newDoc);
     return await this.save();
