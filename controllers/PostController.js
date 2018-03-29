@@ -5,13 +5,20 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getPosts(req, res) {
         try {
-            let postQuery = Post
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    postQuery.populate(populateField);
+            let postQuery;
+            if (req.query.aggregate) {
+                postQuery = Post.aggregate(req.query.aggregate);
+            } else {
+                postQuery = Post
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        postQuery.populate(populateField);
+                    }
                 }
             }
             let posts = await postQuery.exec();
@@ -60,7 +67,7 @@ module.exports = {
             } else {
                 let post = await Post.findById(postId);
                 if (post && req.body) {
-                    let updated = await Post.superupdate(req.body);
+                    let updated = await post.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

@@ -1,6 +1,7 @@
 let mongoose = require('mongoose');
 let Schema = require('mongoose').Schema;
 let bcrypt = require('bcrypt');
+let ROLES = require('../config/roles');
 
 let UserSchema = new Schema({
     name: {
@@ -20,12 +21,15 @@ let UserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    birthday: Date,
+    roles: {
+        type: Array,
+        default: [ROLES.GLOBAL_ROLES.USER_ROLE]
+    },
     avatar: {
         type: Schema.Types.ObjectId,
         ref: 'Image'
     },
-    birthday: Date,
-    roles: [String],//todo
     friends: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
@@ -33,7 +37,9 @@ let UserSchema = new Schema({
 }, {
     timestamps: true
 });
-
+UserSchema.statics.notUpdatable = function(){
+    return ['isBanned','roles'];
+};
 UserSchema.methods.encryptPassword = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
 };

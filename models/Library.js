@@ -4,7 +4,7 @@ let Schema = mongoose.Schema;
 let LibrarySchema = new Schema({
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Library',
+        ref : 'User',
         required: true
     }
 },{

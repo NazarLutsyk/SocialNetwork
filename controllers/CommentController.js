@@ -3,20 +3,21 @@ let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getComments(req, res) {
-        try {
-            let commentQuery = Comment
+        let commentQuery;
+        if (req.query.aggregate) {
+            commentQuery = Comment.aggregate(req.query.aggregate);
+        } else {
+            commentQuery = Comment
                 .find(req.query.query)
                 .sort(req.query.sort)
-                .select(req.query.fields);
+                .select(req.query.fields)
+                .skip(req.query.skip)
+                .limit(req.query.limit);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
                     commentQuery.populate(populateField);
                 }
             }
-            let comments = await commentQuery.exec();
-            res.json(comments);
-        } catch (e) {
-            res.status(404).send(e.toString());
         }
     },
     async getCommentById(req, res) {

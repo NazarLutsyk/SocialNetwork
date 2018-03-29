@@ -5,13 +5,20 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getBooks(req, res) {
         try {
-            let bookQuery = Book
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    bookQuery.populate(populateField);
+            let bookQuery;
+            if (req.query.aggregate) {
+                bookQuery = Book.aggregate(req.query.aggregate);
+            } else {
+                bookQuery = Book
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        bookQuery.populate(populateField);
+                    }
                 }
             }
             let books = await bookQuery.exec();
@@ -61,7 +68,7 @@ module.exports = {
             } else {
                 let book = await Book.findById(bookId);
                 if (book && req.body) {
-                    let updated = await Book.superupdate(req.body);
+                    let updated = await book.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

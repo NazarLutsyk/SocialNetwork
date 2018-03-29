@@ -22,6 +22,7 @@ let BookSchema = new Schema({
 }, {
     discriminatorKey: 'kind',
 });
+BookSchema.statics.notUpdatable = ['path','extension'];
 BookSchema.methods.supersave = async function () {
     let Library = require('./Library');
     let library = await Library.findById(this.author);

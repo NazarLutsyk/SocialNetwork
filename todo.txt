@@ -1,8 +1,13 @@
-//todo add images limit in message post etc.
 //+add timestamps
 //todo add upload images
-//todo add validation
-//todo add disallow update some fields
-//todo add authorization
+//+add validation
+//+add disallow update some fields
+//+change rules to get some models(message chats)
+//+add authorization
+//+add aggregation
+//+add pagination
+//+updatable middleware
+//todo scheduler to delete empty chats
+//+automatically create gallery wall library
 //todo add clusters
 //+delete some update

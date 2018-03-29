@@ -5,13 +5,20 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getImages(req, res) {
         try {
-            let imageQuery = Image
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    imageQuery.populate(populateField);
+            let imageQuery;
+            if (req.query.aggregate) {
+                imageQuery = Image.aggregate(req.query.aggregate);
+            } else {
+                imageQuery = Image
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        imageQuery.populate(populateField);
+                    }
                 }
             }
             let images = await imageQuery.exec();
@@ -47,25 +54,6 @@ module.exports = {
                 let image = new Image(req.body);
                 image = await image.supersave();
                 res.status(201).json(image);
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async updateImage(req, res) {
-        let imageId = req.params.id;
-        try {
-            let err = keysValidator.diff(Image.schema.tree, req.body);
-            if (err){
-                throw new Error('Unknown fields ' + err);
-            } else {
-                let image = await Image.findById(imageId);
-                if (image && req.body) {
-                    let updated = await Image.superupdate(req.body);
-                    res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
-                }
             }
         } catch (e) {
             res.status(400).send(e.toString());

@@ -1,13 +1,19 @@
 let Message = require('../models/Message');
+let Chat = require('../models/Chat');
 let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
     async getMessages(req, res) {
         try {
-            let messageQuery = Message
+            let chats = await Chat.find({members: req.user._id});
+            let messageQuery;
+            messageQuery = Message
+                .find({$or:[{sender: req.user._id},{members: chats}]})
                 .find(req.query.query)
                 .sort(req.query.sort)
-                .select(req.query.fields);
+                .select(req.query.fields)
+                .skip(req.query.skip)
+                .limit(req.query.limit);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
                     messageQuery.populate(populateField);

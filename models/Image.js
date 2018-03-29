@@ -6,10 +6,6 @@ let ImageSchema = new Schema({
         type: String,
         required: true
     },
-    name: {
-        type: String,
-        required: true
-    },
     extension: {
         type: String,
         required: true
@@ -22,7 +18,6 @@ let ImageSchema = new Schema({
 }, {
     discriminatorKey: 'kind'
 });
-
 ImageSchema.methods.supersave = async function () {
     let Gallery = require('./Gallery');
     let gallery = await Gallery.findById(this.author);

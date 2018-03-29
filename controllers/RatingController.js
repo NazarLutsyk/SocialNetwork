@@ -4,13 +4,20 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getRatings(req, res) {
         try {
-            let ratingQuery = Rating
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    ratingQuery.populate(populateField);
+            let ratingQuery;
+            if (req.query.aggregate) {
+                ratingQuery = Rating.aggregate(req.query.aggregate);
+            } else {
+                ratingQuery = Rating
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        ratingQuery.populate(populateField);
+                    }
                 }
             }
             let ratings = await ratingQuery.exec();
@@ -59,7 +66,7 @@ module.exports = {
             } else {
                 let rating = await Rating.findById(ratingId);
                 if (rating && req.body) {
-                    let updated = await Rating.superupdate(req.body);
+                    let updated = await rating.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
