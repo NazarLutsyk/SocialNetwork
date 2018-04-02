@@ -16,11 +16,6 @@ router.route('/')
     );
 router.route('/:id')
     .get(BookController.getBookById)
-    .put(
-        permission.rule(GlobalRule.updatable(Book.notUpdatable),Roles.GLOBAL_ROLES.SUPER_ADMIN),
-        permission.rule(BookRule.updateBook,Roles.GLOBAL_ROLES.SUPER_ADMIN),
-        BookController.updateBook
-    )
     .delete(
         permission.rule(BookRule.updateBook,Roles.GLOBAL_ROLES.SUPER_ADMIN),
         BookController.removeBook);

@@ -1,7 +1,13 @@
 let Book = require('../models/Book');
 let Library = require('../models/Library');
 let keysValidator = require('../validators/keysValidator');
-
+let path = require('path');
+let upload =
+    require('../middleware/multer')(
+        path.join(__dirname, '../public', 'upload', 'books'),
+        [".doc", ".pdf", ".fb2", ".txt"]
+    );
+upload = upload.array('books');
 module.exports = {
     async getBooks(req, res) {
         try {
@@ -43,36 +49,43 @@ module.exports = {
             res.status(404).send(e.toString());
         }
     },
-    async createBook(req, res) {
+    async createBook(req, res, next) {
         try {
             let err = keysValidator.diff(Book.schema.tree, req.body);
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                //todo upload
-                req.body.author = await Library.findOne({author: req.user._id});
+                let author = await Library.findOne({author: req.user._id});
+                if (author) {
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            err.status = 400;
+                            return next(err);
+                        } else {
+                            let books = [];
+                            for (let file in req.files) {
+                                try {
+                                    let book = new Book();
+                                    book.path = req.files[file].filename;
+                                    book.author = author;
+                                    books.push(await book.supersave());
+                                } catch (e) {
+                                    e.status = 400;
+                                    return next(e);
+                                }
+                            }
+                            res.status(201).json(books);
+                        }
+                    });
+                } else {
+                    let error = new Error();
+                    e.status = 400;
+                    return next(e);
+                }
                 let book = new Book(req.body);
                 book = await book.supersave();
                 res.status(201).json(book);
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async updateBook(req, res) {
-        let bookId = req.params.id;
-        try {
-            let err = keysValidator.diff(Book.schema.tree, req.body);
-            if (err){
-                throw new Error('Unknown fields ' + err);
-            } else {
-                let book = await Book.findById(bookId);
-                if (book && req.body) {
-                    let updated = await book.superupdate(req.body);
-                    res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
-                }
+
             }
         } catch (e) {
             res.status(400).send(e.toString());

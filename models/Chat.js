@@ -26,11 +26,11 @@ ChatSchema.methods.supersave = async function () {
 };
 
 ChatSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     let User = require('./User');
 
     let accountExists = await User.count({_id: newDoc.members});
-    if ((accountExists === 0 && this.members.length !== 0) || (accountExists !== this.members.length)) {
+    if ((accountExists === 0 && this.members.length !== 0) || (accountExists !== newDoc.members.length)) {
         throw new Error('Not found related model User!');
     }
     objectHelper.load(this, newDoc);

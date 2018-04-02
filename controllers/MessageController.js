@@ -8,7 +8,7 @@ module.exports = {
             let chats = await Chat.find({members: req.user._id});
             let messageQuery;
             messageQuery = Message
-                .find({$or:[{sender: req.user._id},{members: chats}]})
+                .find({$or: [{sender: req.user._id}, {chat: chats}]})
                 .find(req.query.query)
                 .sort(req.query.sort)
                 .select(req.query.fields)
@@ -28,7 +28,8 @@ module.exports = {
     async getMessageById(req, res) {
         let messageId = req.params.id;
         try {
-            let messageQuery = Message.findOne({_id: messageId})
+            let chats = await Chat.find({members: req.user._id});
+            let messageQuery = Message.findOne({_id: messageId, $or: [{sender: req.user._id}, {chat: chats}]})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {

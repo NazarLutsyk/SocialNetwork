@@ -1,5 +1,5 @@
 //+add timestamps
-//todo add upload images
+//+add upload images
 //+add validation
 //+add disallow update some fields
 //+change rules to get some models(message chats)
@@ -7,7 +7,9 @@
 //+add aggregation
 //+add pagination
 //+updatable middleware
-//todo scheduler to delete empty chats
+//+scheduler to delete empty chats
 //+automatically create gallery wall library
 //todo add clusters
+//todo add not updatable fields
+//+add upload books
 //+delete some update

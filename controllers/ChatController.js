@@ -45,8 +45,9 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                //todo auto members
                 let chat = new Chat(req.body);
+                if(chat.members.indexOf(req.user._id) === -1)
+                    chat.members.push(req.user._id);
                 chat = await chat.supersave();
                 res.status(201).json(chat);
             }

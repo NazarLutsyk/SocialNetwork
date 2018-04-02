@@ -1,7 +1,13 @@
 let Image = require('../models/Image');
 let Gallery = require('../models/Gallery');
 let keysValidator = require('../validators/keysValidator');
-
+let path = require('path');
+let upload =
+    require('../middleware/multer')(
+        path.join(__dirname, '../public', 'upload', 'images'),
+        [".jpg", ".jpeg", ".png", ".svg", ".gif"]
+    );
+upload = upload.array('images');
 module.exports = {
     async getImages(req, res) {
         try {
@@ -43,18 +49,41 @@ module.exports = {
             res.status(404).send(e.toString());
         }
     },
-    async createImage(req, res) {
+    async createImage(req, res, next) {
         try {
             let err = keysValidator.diff(Image.schema.tree, req.body);
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                //todo upload
-                req.body.author = await Gallery.findOne({author: req.user._id});
-                let image = new Image(req.body);
-                image = await image.supersave();
-                res.status(201).json(image);
+                let author = await Gallery.findOne({author: req.user._id});
+                if (author) {
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            err.status = 400;
+                            return next(err);
+                        } else {
+                            let images = [];
+                            for (let file in req.files) {
+                                try {
+                                    let image = new Image();
+                                    image.path = req.files[file].filename;
+                                    image.author = author;
+                                    images.push(await image.supersave());
+                                } catch (e) {
+                                    e.status = 400;
+                                    return next(e);
+                                }
+                            }
+                            res.status(201).json(images);
+                        }
+                    });
+                } else {
+                    let error = new Error();
+                    e.status = 400;
+                    return next(e);
+                }
             }
+
         } catch (e) {
             res.status(400).send(e.toString());
         }

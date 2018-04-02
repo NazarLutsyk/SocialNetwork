@@ -6,18 +6,17 @@ let ImageSchema = new Schema({
         type: String,
         required: true
     },
-    extension: {
-        type: String,
-        required: true
-    },
     author: {
         type: Schema.Types.ObjectId,
-        ref:'gallery',
+        ref: 'gallery',
         required: true
     }
 }, {
     discriminatorKey: 'kind'
 });
+ImageSchema.statics.notUpdatable = function (){
+    return ['path'];
+};
 ImageSchema.methods.supersave = async function () {
     let Gallery = require('./Gallery');
     let gallery = await Gallery.findById(this.author);
@@ -39,7 +38,16 @@ ImageSchema.methods.superupdate = async function (newDoc) {
 module.exports = Evaluetable.discriminator('Image', ImageSchema);
 
 let Post = require('./Post');
-ImageSchema.pre('remove', async function () {
+ImageSchema.pre('remove', async function (next) {
+    let fileHelper = require('../helpers/fileHelper');
+    let path = require('path');
+    try {
+        let toDelete = path.join(__dirname, "../public", "upload", "images", this.path);
+        fileHelper.deleteFiles(toDelete);
+        return next();
+    } catch (e) {
+        return next(e);
+    }
     await Post.update(
         {images: this._id},
         {$pull: {images: this._id}},

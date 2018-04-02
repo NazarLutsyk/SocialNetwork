@@ -10,6 +10,7 @@ let MongoStorage = require('connect-mongo')(session);
 let passport = require('passport');
 let helmet = require('helmet');
 let cors = require('cors');
+require('./config/schedule');
 
 require('./config/passport/index');
 

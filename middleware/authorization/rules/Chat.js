@@ -6,7 +6,8 @@ module.exports = {
             let chatId = req.params.id;
 
             let chat = await Chat.count({_id: chatId, members: user._id});
-            if (chat) {
+            let okUpdate = true;
+            if (chat && okUpdate) {
                 next();
             } else {
                 return res.sendStatus(403);
