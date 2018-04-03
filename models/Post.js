@@ -52,11 +52,15 @@ PostSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.author) {
         throw new Error('Can`t update relations!');
     }
-    if ((bookExists === 0 && this.books.length !== 0) || (bookExists !== newDoc.books.length)) {
-        throw new Error('Not found related model Book!');
+    if (newDoc.books && newDoc.books.length > 0) {
+        if ((bookExists === 0 && this.books.length !== 0) || (bookExists !== newDoc.books.length)) {
+            throw new Error('Not found related model Book!');
+        }
     }
-    if ((imageExists === 0 && this.images.length !== 0) || (imageExists !== newDoc.images.length)) {
-        throw new Error('Not found related model Image!');
+    if (newDoc.images && newDoc.images.length > 0) {
+        if ((imageExists === 0 && this.images.length !== 0) || (imageExists !== newDoc.images.length)) {
+            throw new Error('Not found related model Image!');
+        }
     }
     objectHelper.load(this, newDoc);
     return await this.save();

@@ -14,6 +14,9 @@ let BookSchema = new Schema({
 }, {
     discriminatorKey: 'kind',
 });
+BookSchema.statics.notUpdatable = function (){
+    return ['path'];
+};
 BookSchema.methods.supersave = async function () {
     let Library = require('./Library');
     let library = await Library.findById(this.author);
@@ -32,21 +35,21 @@ BookSchema.methods.superupdate = async function (newDoc) {
     return await this.save();
 };
 
-module.exports = Evaluetable.discriminator('Book',BookSchema);
+module.exports = Evaluetable.discriminator('Book', BookSchema);
 let Post = require('./Post');
 BookSchema.pre('remove', async function () {
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
     try {
+        await Post.update(
+            {books: this._id},
+            {$pull: {books: this._id}},
+            {multi: true}
+        );
         let toDelete = path.join(__dirname, "../public", "upload", "books", this.path);
         fileHelper.deleteFiles(toDelete);
         return next();
     } catch (e) {
         return next(e);
     }
-    await Post.update(
-        {books: this._id},
-        {$pull: {books: this._id}},
-        {multi: true}
-    );
 });

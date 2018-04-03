@@ -12,7 +12,7 @@ let ChatSchema = new Schema({
             ref: 'User'
         }]
     },
-},{
+}, {
     timestamps: true
 });
 
@@ -30,8 +30,10 @@ ChatSchema.methods.superupdate = async function (newDoc) {
     let User = require('./User');
 
     let accountExists = await User.count({_id: newDoc.members});
-    if ((accountExists === 0 && this.members.length !== 0) || (accountExists !== newDoc.members.length)) {
-        throw new Error('Not found related model User!');
+    if (newDoc.members && newDoc.members.length > 0) {
+        if ((accountExists === 0 && this.members.length !== 0) || (accountExists !== newDoc.members.length)) {
+            throw new Error('Not found related model User!');
+        }
     }
     objectHelper.load(this, newDoc);
     return await this.save();
