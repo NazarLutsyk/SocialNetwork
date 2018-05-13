@@ -2,8 +2,9 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let EvaluetableSchema = new Schema({
-},{
-    timestamps: true
+}, {
+    timestamps: true,
+    discriminatorKey: 'kind'
 });
 
 module.exports = mongoose.model('Evaluetable',EvaluetableSchema);

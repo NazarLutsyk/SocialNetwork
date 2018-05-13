@@ -51,37 +51,32 @@ module.exports = {
     },
     async createImage(req, res, next) {
         try {
-            let err = keysValidator.diff(Image.schema.tree, req.body);
-            if (err) {
-                throw new Error('Unknown fields ' + err);
-            } else {
-                let author = await Gallery.findOne({author: req.user._id});
-                if (author) {
-                    upload(req, res, async function (err) {
-                        if (err) {
-                            err.status = 400;
-                            return next(err);
-                        } else {
-                            let images = [];
-                            for (let file in req.files) {
-                                try {
-                                    let image = new Image();
-                                    image.path = req.files[file].filename;
-                                    image.author = author;
-                                    images.push(await image.supersave());
-                                } catch (e) {
-                                    e.status = 400;
-                                    return next(e);
-                                }
+            let author = await Gallery.findOne({author: req.user._id});
+            if (author) {
+                upload(req, res, async function (err) {
+                    if (err) {
+                        err.status = 400;
+                        return next(err);
+                    } else {
+                        let images = [];
+                        for (let file in req.files) {
+                            try {
+                                let image = new Image();
+                                image.path = '/upload/images/' + req.files[file].filename;
+                                image.author = author;
+                                images.push(await image.supersave());
+                            } catch (e) {
+                                e.status = 400;
+                                return next(e);
                             }
-                            res.status(201).json(images);
                         }
-                    });
-                } else {
-                    let error = new Error();
-                    e.status = 400;
-                    return next(e);
-                }
+                        res.status(201).json(images);
+                    }
+                });
+            } else {
+                let error = new Error();
+                e.status = 400;
+                return next(e);
             }
 
         } catch (e) {

@@ -27,9 +27,7 @@ module.exports = {
                 await wall.supersave();
                 await gallery.supersave();
                 await library.supersave();
-                return res.status(200).json({
-                    user: req.user
-                });
+                return res.status(200).json(req.user);
             });
 
         })(req, res, next);
@@ -46,9 +44,7 @@ module.exports = {
                 if (err) {
                     return next(err);
                 }
-                return res.status(200).json({
-                    user: req.user
-                });
+                return res.status(200).json(req.user);
             });
         })(req, res, next);
     },

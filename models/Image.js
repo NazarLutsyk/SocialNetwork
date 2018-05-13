@@ -42,7 +42,7 @@ ImageSchema.pre('remove', async function (next) {
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
     try {
-        let toDelete = path.join(__dirname, "../public", "upload", "images", this.path);
+        let toDelete = path.join(__dirname, "../public", this.path);
         fileHelper.deleteFiles(toDelete);
         return next();
     } catch (e) {

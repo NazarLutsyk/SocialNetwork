@@ -7,9 +7,7 @@ router.post('/local/signin', PassportMiddleware.notLoggedIn, AuthController.sign
 router.get('/logout', PassportMiddleware.isLoggedIn, AuthController.logout);
 
 router.get('/principal', function (req, res) {
-    res.json({
-        user: req.user
-    });
+    res.json(req.user);
 });
 
 module.exports = router;
