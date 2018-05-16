@@ -1,4 +1,4 @@
-let Wall = require('../../../models/Wall');
+let User = require('../../../models/User');
 let Post = require('../../../models/Post');
 module.exports = {
     async updatePost(req, res, next) {
@@ -6,7 +6,7 @@ module.exports = {
             let user = req.user;
             let postId = req.params.id;
             let post = await Post.findById(postId);
-            let wall = await Wall.count({_id: post.author, author: user._id});
+            let wall = await User.count({_id: post.author, _id: user._id});
             if (wall > 0) {
                 next();
             } else {

@@ -1,4 +1,4 @@
-module.exports = function (pathToDir,allwedExtensions) {
+module.exports = function (pathToDir, allwedExtensions) {
     let path = require("path");
     let multer = require("multer");
     let mkdirp = require("mkdirp");
@@ -15,16 +15,15 @@ module.exports = function (pathToDir,allwedExtensions) {
         filename: function (req, file, cb) {
             let originalname = file.originalname;
             let separator = originalname.lastIndexOf(".");
-
-
-            let extension = originalname.substring(separator);
+            
+            let extension = originalname.substring(separator).toLowerCase();
             let id = Math.floor(Math.random() * (1000000 - 1) + 1);
 
             let resultFilename = id + "-" + Date.now() + extension;
             if (allwedExtensions && allwedExtensions.indexOf(extension) != -1) {
-                cb(null, resultFilename);
+                return cb(null, resultFilename);
             } else {
-                cb(new Error("Bad extension"));
+                return cb(new Error("Bad extension"));
             }
         }
     });

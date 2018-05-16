@@ -1,5 +1,5 @@
 let Image = require('../models/Image');
-let Gallery = require('../models/Gallery');
+let User = require('../models/User');
 let keysValidator = require('../validators/keysValidator');
 let path = require('path');
 let upload =
@@ -51,7 +51,7 @@ module.exports = {
     },
     async createImage(req, res, next) {
         try {
-            let author = await Gallery.findOne({author: req.user._id});
+            let author = await User.findOne({_id: req.user._id});
             if (author) {
                 upload(req, res, async function (err) {
                     if (err) {

@@ -1,5 +1,5 @@
 let Post = require('../models/Post');
-let Wall = require('../models/Wall');
+let User = require('../models/User');
 let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                req.body.author = await Wall.findOne({author: req.user._id});
+                req.body.author = await User.findOne({_id: req.user._id});
                 let post = new Post(req.body);
                 post = await post.supersave();
                 res.status(201).json(post);

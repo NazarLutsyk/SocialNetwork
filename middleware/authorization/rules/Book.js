@@ -1,4 +1,4 @@
-let Library = require('../../../models/Library');
+let User = require('../../../models/User');
 let Book = require('../../../models/Book');
 module.exports = {
     async updateBook(req, res, next) {
@@ -6,7 +6,7 @@ module.exports = {
             let user = req.user;
             let bookId = req.params.id;
             let book = await Book.findById(bookId);
-            let library = await Library.count({_id: book.author, author: user._id});
+            let library = await User.count({_id: book.author, _id: user._id});
             if (library > 0) {
                 next();
             } else {

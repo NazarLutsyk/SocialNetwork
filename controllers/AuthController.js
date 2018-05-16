@@ -1,7 +1,4 @@
 let passport = require('passport');
-let Wall = require('../models/Wall');
-let Library = require('../models/Library');
-let Gallery = require('../models/Gallery');
 module.exports = {
     signUp(req, res, next) {
         passport.authenticate('local.signup', function (err, user, info) {
@@ -15,18 +12,6 @@ module.exports = {
                 if (err) {
                     return next(err);
                 }
-                let wall = new Wall({
-                    author: user._id
-                });
-                let library = new Library({
-                    author: user._id
-                });
-                let gallery = new Gallery({
-                    author: user._id
-                });
-                await wall.supersave();
-                await gallery.supersave();
-                await library.supersave();
                 return res.status(200).json(req.user);
             });
 

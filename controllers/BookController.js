@@ -1,5 +1,5 @@
 let Book = require('../models/Book');
-let Library = require('../models/Library');
+let User = require('../models/User');
 let keysValidator = require('../validators/keysValidator');
 let path = require('path');
 let upload =
@@ -28,7 +28,14 @@ module.exports = {
                 }
             }
             let books = await bookQuery.exec();
-            res.json(books);
+
+            let newBooks = [];
+            for (let book of books) {
+                book = book.toObject();
+                book.isOwnBook = book.author.toString() == req.user._id.toString();
+                newBooks.push(book)
+            }
+            res.json(newBooks);
         } catch (e) {
             res.status(404).send(e.toString());
         }
@@ -44,6 +51,8 @@ module.exports = {
                 }
             }
             let book = await bookQuery.exec();
+            book = book.toObject();
+            book.isOwnBook = book.author == req.user._id;
             res.json(book);
         } catch (e) {
             res.status(404).send(e.toString());
@@ -51,53 +60,46 @@ module.exports = {
     },
     async createBook(req, res, next) {
         try {
-            let err = keysValidator.diff(Book.schema.tree, req.body);
-            if (err) {
-                throw new Error('Unknown fields ' + err);
-            } else {
-                let author = await Library.findOne({author: req.user._id});
-                if (author) {
-                    upload(req, res, async function (err) {
-                        if (err) {
-                            err.status = 400;
-                            return next(err);
-                        } else {
-                            let books = [];
-                            for (let file in req.files) {
-                                try {
-                                    let book = new Book();
-                                    book.path = req.files[file].filename;
-                                    book.author = author;
-                                    books.push(await book.supersave());
-                                } catch (e) {
-                                    e.status = 400;
-                                    return next(e);
-                                }
+            let author = await User.findOne({_id: req.user._id});
+            if (author) {
+                upload(req, res, async function (err) {
+                    if (err) {
+                        err.status = 400;
+                        return next(err);
+                    } else {
+                        let books = [];
+                        for (let file in req.files) {
+                            try {
+                                let book = new Book();
+                                book.name = req.files[file].originalname;
+                                book.path = req.files[file].filename;
+                                book.author = author;
+                                books.push(await book.supersave());
+                            } catch (e) {
+                                e.status = 400;
+                                return next(e);
                             }
-                            res.status(201).json(books);
                         }
-                    });
-                } else {
-                    let error = new Error();
-                    e.status = 400;
-                    return next(e);
-                }
-                let book = new Book(req.body);
-                book = await book.supersave();
-                res.status(201).json(book);
-
+                        return res.status(201).json(books);
+                    }
+                });
+            } else {
+                let error = new Error();
+                e.status = 400;
+                return next(e);
             }
         } catch (e) {
             res.status(400).send(e.toString());
         }
     },
-    async removeBook(req, res) {
+    async removeBook(req, res, next) {
         let bookId = req.params.id;
         try {
             let book = await Book.findById(bookId);
             book = await book.remove();
             res.status(204).json(book);
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     }

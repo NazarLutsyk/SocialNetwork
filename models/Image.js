@@ -8,7 +8,7 @@ let ImageSchema = new Schema({
     },
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'gallery',
+        ref: 'user',
         required: true
     }
 }, {
@@ -18,10 +18,10 @@ ImageSchema.statics.notUpdatable = function (){
     return ['path'];
 };
 ImageSchema.methods.supersave = async function () {
-    let Gallery = require('./Gallery');
-    let gallery = await Gallery.findById(this.author);
-    if (!gallery) {
-        throw new Error('Not found related model Gallery!');
+    let User = require('./User');
+    let author = await User.findById(this.author);
+    if (!author) {
+        throw new Error('Not found related model User!');
     }
     return await this.save();
 };

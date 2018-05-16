@@ -5,7 +5,7 @@ let PostSchema = new Schema({
     text: String,
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'Wall',
+        ref: 'User',
         required: true
     },
     images: [{
@@ -21,11 +21,11 @@ let PostSchema = new Schema({
 });
 
 PostSchema.methods.supersave = async function () {
-    let Wall = require('./Wall');
+    let User = require('./User');
     let Book = require('./Book');
     let Image = require('./Image');
 
-    let wall = await Wall.findById(this.author);
+    let user = await User.findById(this.author);
     let bookExists = await Book.count({_id: this.books});
     let imageExists = await Image.count({_id: this.images});
 
@@ -35,8 +35,8 @@ PostSchema.methods.supersave = async function () {
     if ((imageExists === 0 && this.images.length !== 0) || (imageExists !== this.images.length)) {
         throw new Error('Not found related model Image!');
     }
-    if (!wall) {
-        throw new Error('Not found related model Wall!');
+    if (!user) {
+        throw new Error('Not found related model User!');
     }
     return await this.save();
 };

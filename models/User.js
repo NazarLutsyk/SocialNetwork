@@ -67,9 +67,17 @@ UserSchema.methods.superupdate = async function (context, newDoc) {
                     toRemove.push(friend);
             }
             if (toRemove)
-                await context.update({_id: {$in: toRemove}}, {$pull: {friends: this._id}}, {multi: true,runValidators: true, context: 'query'});
+                await context.update({_id: {$in: toRemove}}, {$pull: {friends: this._id}}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
             if (toAdd)
-                await context.update({_id: {$in: toAdd}}, {$addToSet: {friends: this._id}}, {multi: true,runValidators: true, context: 'query'});
+                await context.update({_id: {$in: toAdd}}, {$addToSet: {friends: this._id}}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
         } else {
             throw new Error('Not found related model context!');
         }
@@ -82,10 +90,19 @@ UserSchema.methods.superupdate = async function (context, newDoc) {
 module.exports = mongoose.model('User', UserSchema);
 
 let Chat = require('./Chat');
-let Gallery = require('./Gallery');
-let Wall = require('./Wall');
-let Library = require('./Library');
 UserSchema.pre('remove', async function () {
+    let Image = require('./Image');
+    let Book = require('./Book');
+    let Post = require('./Post');
+    await Image.remove(
+        {author: this._id}
+    );
+    await Book.remove(
+        {author: this._id}
+    );
+    await Post.remove(
+        {author: this._id}
+    );
     await UserSchema.update(
         {_id: this.friends},
         {$pull: {friends: this._id}}
@@ -99,14 +116,5 @@ UserSchema.pre('remove', async function () {
     );
     await Message.remove(
         {sender: this._id}
-    );
-    await Gallery.remove(
-        {author: this._id}
-    );
-    await Wall.remove(
-        {author: this._id}
-    );
-    await Library.remove(
-        {author: this._id}
     );
 });
