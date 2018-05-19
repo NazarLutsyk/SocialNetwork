@@ -32,7 +32,7 @@ module.exports = {
             let newBooks = [];
             for (let book of books) {
                 book = book.toObject();
-                book.isOwnBook = book.author.toString() == req.user._id.toString();
+                book.isOwnBook = book.author.toString() === req.user._id.toString();
                 newBooks.push(book)
             }
             res.json(newBooks);
@@ -52,7 +52,7 @@ module.exports = {
             }
             let book = await bookQuery.exec();
             book = book.toObject();
-            book.isOwnBook = book.author == req.user._id;
+            book.isOwnBook = book.author === req.user._id;
             res.json(book);
         } catch (e) {
             res.status(404).send(e.toString());
@@ -73,14 +73,20 @@ module.exports = {
                                 let book = new Book();
                                 book.name = req.files[file].originalname;
                                 book.path = req.files[file].filename;
-                                book.author = author;
+                                book.author = author._id;
                                 books.push(await book.supersave());
                             } catch (e) {
                                 e.status = 400;
                                 return next(e);
                             }
                         }
-                        return res.status(201).json(books);
+                        let newBooks = [];
+                        for (let book of books) {
+                            book = book.toObject();
+                            book.isOwnBook = book.author.toString() === req.user._id.toString();
+                            newBooks.push(book)
+                        }
+                        return res.json(newBooks);
                     }
                 });
             } else {

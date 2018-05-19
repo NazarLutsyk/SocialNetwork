@@ -44,8 +44,8 @@ module.exports = {
             } else {
                 req.body.author = req.user._id;
                 let book = new Book(req.body);
-                book = await book.supersave();
-                res.status(201).json(book);
+                book = await image.supersave();
+                res.status(201).json(image);
             }
         } catch (e) {
             res.status(400).send(e.toString());

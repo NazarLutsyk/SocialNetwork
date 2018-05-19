@@ -29,6 +29,7 @@ module.exports = {
                 user.booksCount = await Book.count({author: user.library});
                 user.friendsCount = await User.count({friends: user._id});
                 user.isFriend = req.user.friends.indexOf(user._id.toString()) >= 0 || user._id.toString() === req.user._id.toString();
+                user.isPrincipal = user._id.toString() === req.user._id.toString();
                 newUsers.push(user)
             }
             res.json(newUsers);
@@ -52,6 +53,7 @@ module.exports = {
             user.booksCount = await Book.count({author: user.library});
             user.friendsCount = await User.count({friends: user._id});
             user.isFriend = req.user.friends.indexOf(user._id.toString()) >= 0 || user._id.toString() === req.user._id.toString();
+            user.isPrincipal = user._id.toString() === req.user._id.toString();
             res.json(user);
         } catch (e) {
             res.status(404).send(e.toString());

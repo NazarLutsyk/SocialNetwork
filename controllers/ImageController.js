@@ -28,7 +28,13 @@ module.exports = {
                 }
             }
             let images = await imageQuery.exec();
-            res.json(images);
+            let newImages = [];
+            for (let image of images) {
+                image = image.toObject();
+                image.isOwnImage = image.author.toString() === req.user._id.toString();
+                newImages.push(image)
+            }
+            res.json(newImages);
         } catch (e) {
             res.status(404).send(e.toString());
         }
@@ -44,6 +50,8 @@ module.exports = {
                 }
             }
             let image = await imageQuery.exec();
+            image = image.toObject();
+            image.isOwnImage = image.author === req.user._id;
             res.json(image);
         } catch (e) {
             res.status(404).send(e.toString());
@@ -63,14 +71,20 @@ module.exports = {
                             try {
                                 let image = new Image();
                                 image.path = '/upload/images/' + req.files[file].filename;
-                                image.author = author;
+                                image.author = author._id;
                                 images.push(await image.supersave());
                             } catch (e) {
                                 e.status = 400;
                                 return next(e);
                             }
                         }
-                        res.status(201).json(images);
+                        let newImages = [];
+                        for (let image of images) {
+                            image = image.toObject();
+                            image.isOwnImage = image.author.toString() === req.user._id.toString();
+                            newImages.push(image)
+                        }
+                        return res.json(newImages);
                     }
                 });
             } else {

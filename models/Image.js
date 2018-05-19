@@ -14,7 +14,7 @@ let ImageSchema = new Schema({
 }, {
     discriminatorKey: 'kind'
 });
-ImageSchema.statics.notUpdatable = function (){
+ImageSchema.statics.notUpdatable = function () {
     return ['path'];
 };
 ImageSchema.methods.supersave = async function () {
@@ -37,7 +37,6 @@ ImageSchema.methods.superupdate = async function (newDoc) {
 
 module.exports = Evaluetable.discriminator('Image', ImageSchema);
 
-let Post = require('./Post');
 ImageSchema.pre('remove', async function (next) {
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
@@ -48,10 +47,5 @@ ImageSchema.pre('remove', async function (next) {
     } catch (e) {
         return next(e);
     }
-    await Post.update(
-        {images: this._id},
-        {$pull: {images: this._id}},
-        {multi: true}
-    );
 });
 

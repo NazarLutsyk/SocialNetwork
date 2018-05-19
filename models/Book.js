@@ -37,15 +37,9 @@ BookSchema.methods.superupdate = async function (newDoc) {
 };
 
 module.exports = Evaluetable.discriminator('Book', BookSchema);
-let Post = require('./Post');
 BookSchema.pre('remove', async function () {
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
-    await Post.update(
-        {books: this._id},
-        {$pull: {books: this._id}},
-        {multi: true}
-    );
     let toDelete = path.join(__dirname, "../public", "upload", "books", this.path);
     fileHelper.deleteFiles(toDelete);
 });
