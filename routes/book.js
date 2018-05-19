@@ -11,7 +11,7 @@ const router = express.Router();
 router.route('/')
     .get(BookController.getBooks)
     .post(
-        permission.rule(GlobalRule.updatable(Book.notUpdatable),Roles.GLOBAL_ROLES.SUPER_ADMIN),
+        permission.rule(GlobalRule.updatable(Book.notUpdatable()),Roles.GLOBAL_ROLES.SUPER_ADMIN),
         BookController.createBook
     );
 router.route('/:id')

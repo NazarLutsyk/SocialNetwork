@@ -18,9 +18,7 @@ let PostSchema = new Schema({
 
 PostSchema.methods.supersave = async function () {
     let User = require('./User');
-
     let user = await User.findById(this.author);
-
     if (!user) {
         throw new Error('Not found related model User!');
     }
@@ -29,7 +27,6 @@ PostSchema.methods.supersave = async function () {
 
 PostSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require('../helpers/objectHelper');
-
     if (newDoc.author) {
         throw new Error('Can`t update relations!');
     }

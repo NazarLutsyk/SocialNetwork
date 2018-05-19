@@ -10,6 +10,8 @@ exports.LocalSignup = new LocalStrategy({
             if (await User.count({login: login}) > 0) {
                 return done(null, false,{message: 'Login is already in use.'});
             } else {
+                req.body.avatar = undefined;
+                req.body.thumb = undefined;
                 let user = new User(req.body);
                 user.password = user.encryptPassword(user.password);
                 user = await user.save();

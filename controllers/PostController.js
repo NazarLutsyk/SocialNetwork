@@ -22,7 +22,13 @@ module.exports = {
                 }
             }
             let posts = await postQuery.exec();
-            res.json(posts);
+            let newPosts = [];
+            for (let post of posts) {
+                post = post.toObject();
+                post.isOwnPost = post.author.toString() === req.user._id.toString();
+                newPosts.push(post)
+            }
+            res.json(newPosts);
         } catch (e) {
             res.status(404).send(e.toString());
         }
@@ -38,6 +44,8 @@ module.exports = {
                 }
             }
             let post = await postQuery.exec();
+            post = post.toObject();
+            post.isOwnPost = post.author === req.user._id;
             res.json(post);
         } catch (e) {
             res.status(404).send(e.toString());
@@ -49,9 +57,12 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                req.body.author = await User.findOne({_id: req.user._id});
+                let author = await User.findOne({_id: req.user._id});
                 let post = new Post(req.body);
+                post.author = author._id;
                 post = await post.supersave();
+                post = post.toObject();
+                post.isOwnPost = post.author === req.user._id;
                 res.status(201).json(post);
             }
         } catch (e) {

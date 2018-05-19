@@ -2,10 +2,8 @@ let Evaluetable = require('./Evaluetable');
 let Schema = require('mongoose').Schema;
 
 let ImageSchema = new Schema({
-    path: {
-        type: String,
-        required: true
-    },
+    path: String,
+    url: String,
     author: {
         type: Schema.Types.ObjectId,
         ref: 'user',
@@ -38,14 +36,29 @@ ImageSchema.methods.superupdate = async function (newDoc) {
 module.exports = Evaluetable.discriminator('Image', ImageSchema);
 
 ImageSchema.pre('remove', async function (next) {
+    let Post = require('./Post');
+    let User = require('./User');
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
-    try {
+    await Post.update(
+        {images: this.url},
+        {$pull: {images: this.url}},
+        {multi: true}
+    );
+    await User.update(
+        {avatar: this.url},
+        {avatar: 'http://localhost:3000/upload/images/default-avatar.jpg'},
+        {multi: true, setDefaultsOnInsert: true}
+    );
+    await User.update(
+        {thumb: this.url},
+        {thumb: 'http://localhost:3000/upload/images/default-thumb.jpg'},
+        {multi: true, setDefaultsOnInsert: true}
+    );
+    if (this.path) {
         let toDelete = path.join(__dirname, "../public", this.path);
         fileHelper.deleteFiles(toDelete);
         return next();
-    } catch (e) {
-        return next(e);
     }
 });
 

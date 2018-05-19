@@ -27,12 +27,12 @@ let UserSchema = new Schema({
         default: [ROLES.GLOBAL_ROLES.USER_ROLE]
     },
     avatar: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
+        type: String,
+        default: 'http://localhost:3000/upload/images/default-avatar.jpg'
     },
     thumb: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
+        type: String,
+        default: 'http://localhost:3000/upload/images/default-thumb.jpg'
     },
     friends: [{
         type: Schema.Types.ObjectId,

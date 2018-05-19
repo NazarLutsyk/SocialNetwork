@@ -11,7 +11,7 @@ const router = express.Router();
 router.route('/')
     .get(ImageController.getImages)
     .post(
-        permission.rule(GlobalRule.updatable(Image.notUpdatable)),
+        permission.rule(GlobalRule.updatable(Image.notUpdatable())),
         ImageController.createImage
     );
 router.route('/:id')

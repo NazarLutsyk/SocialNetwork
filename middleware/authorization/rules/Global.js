@@ -4,7 +4,7 @@ exports.updatable = function (notAllowed) {
     return async function (req, res, next) {
         try {
             if (req.body && objectHelper.someKeyContains(req.body, notAllowed)) {
-                res.sendStatus(400);
+                res.sendStatus(403);
             } else {
                 next();
             }

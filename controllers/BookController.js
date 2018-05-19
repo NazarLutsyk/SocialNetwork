@@ -68,17 +68,26 @@ module.exports = {
                         return next(err);
                     } else {
                         let books = [];
-                        for (let file in req.files) {
-                            try {
-                                let book = new Book();
-                                book.name = req.files[file].originalname;
-                                book.path = req.files[file].filename;
-                                book.author = author._id;
-                                books.push(await book.supersave());
-                            } catch (e) {
-                                e.status = 400;
-                                return next(e);
+                        if (req.files && req.files.length > 0) {
+                            for (let file in req.files) {
+                                try {
+                                    let book = new Book();
+                                    book.name = req.files[file].originalname;
+                                    book.path = '/upload/books/' + req.files[file].filename;
+                                    book.url = 'http://localhost:3000' + book.path;
+                                    book.author = author._id;
+                                    books.push(await book.supersave());
+                                } catch (e) {
+                                    e.status = 400;
+                                    return next(e);
+                                }
                             }
+                        } else {
+                            let book = new Book();
+                            book.name = req.body.url;
+                            book.url = req.body.url;
+                            book.author = author._id;
+                            books.push(await book.supersave());
                         }
                         let newBooks = [];
                         for (let book of books) {

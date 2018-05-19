@@ -67,16 +67,25 @@ module.exports = {
                         return next(err);
                     } else {
                         let images = [];
-                        for (let file in req.files) {
-                            try {
-                                let image = new Image();
-                                image.path = '/upload/images/' + req.files[file].filename;
-                                image.author = author._id;
-                                images.push(await image.supersave());
-                            } catch (e) {
-                                e.status = 400;
-                                return next(e);
+                        if (req.files && req.files.length > 0) {
+                            for (let file in req.files) {
+                                try {
+                                    let image = new Image();
+                                    image.path = '/upload/images/' + req.files[file].filename;
+                                    image.author = author._id;
+                                    image.url = 'http://localhost:3000' + image.path;
+                                    images.push(await image.supersave());
+                                } catch (e) {
+                                    e.status = 400;
+                                    return next(e);
+                                }
                             }
+                        } else {
+                            let image = new Image();
+                            image.name = req.body.url;
+                            image.url = req.body.url;
+                            image.author = author._id;
+                            images.push(await image.supersave());
                         }
                         let newImages = [];
                         for (let image of images) {

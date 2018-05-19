@@ -3,10 +3,8 @@ let Schema = require('mongoose').Schema;
 
 let BookSchema = new Schema({
     name: String,
-    path: {
-        type: String,
-        required: true
-    },
+    path: String,
+    url: String,
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -38,8 +36,16 @@ BookSchema.methods.superupdate = async function (newDoc) {
 
 module.exports = Evaluetable.discriminator('Book', BookSchema);
 BookSchema.pre('remove', async function () {
+    let Post = require('./Post');
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
-    let toDelete = path.join(__dirname, "../public", "upload", "books", this.path);
-    fileHelper.deleteFiles(toDelete);
+    await Post.update(
+        {books: this.url},
+        {$pull: {books: this.url}},
+        {multi: true}
+    );
+    if (this.path) {
+        let toDelete = path.join(__dirname, "../public", this.path);
+        fileHelper.deleteFiles(toDelete);
+    }
 });
