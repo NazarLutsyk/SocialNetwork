@@ -25,6 +25,10 @@ function normalizePort(val) {
   return false;
 }
 
+module.exports = server;
+require('./socket');
+
+
 function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;

@@ -23,8 +23,4 @@ module.exports = {
         }
         return res;
     },
-    toPopulate(str) {
-        let fields = str.split(',');
-        return fields;
-    },
 };

@@ -17,7 +17,9 @@ let MessageSchema = new Schema({
         required: true
     },
 },{
-    timestamps: true
+    timestamps: true,
+    toObject: {},
+    toJSON: {},
 });
 MessageSchema.methods.supersave = async function () {
     let User = require('./User');
