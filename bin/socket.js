@@ -15,6 +15,9 @@ io.on('connect', function (socket) {
             socket.join(room._id);
         }
     });
+    socket.on('leaveRoom', async (data) => {
+        socket.leave(data.chat._id);
+    });
     socket.on('disconnectFromRoom', (room) => {
         if (room && room._id) {
             socket.leave(room._id);

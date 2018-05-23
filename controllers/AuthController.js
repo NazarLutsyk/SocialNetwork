@@ -35,6 +35,6 @@ module.exports = {
     },
     logout(req, res, next) {
         req.logout();
-        res.sendStatus(200);
+        res.json({ok: true});
     }
 };
